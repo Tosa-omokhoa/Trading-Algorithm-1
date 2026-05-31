@@ -1,0 +1,56 @@
+# =============================================================================
+# SynthTrade - .gitignore
+# =============================================================================
+
+# --- Credentials (NEVER commit these) ---
+.env
+*.env
+
+# --- Cached data (too large for GitHub, regenerated on first run) ---
+data/raw/*.parquet
+data/raw/*.csv
+
+# --- Trained models (use GitHub Releases or HuggingFace Hub for these) ---
+models/saved/*.h5
+models/saved/*.keras
+models/saved/*.pkl
+
+# --- Backtest results ---
+backtest/results/*.csv
+backtest/results/*.json
+backtest/results/*.html
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# --- Virtual environment ---
+venv/
+env/
+.venv/
+ENV/
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+*.ipynb
+
+# --- IDE ---
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+
+# --- Streamlit ---
+.streamlit/secrets.toml
