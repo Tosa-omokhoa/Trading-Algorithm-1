@@ -405,12 +405,13 @@ def run_pipeline(
 
     # --- Step 5: Build sequences ---
     X, y = None, None
+    feature_cols = get_indicator_feature_columns()
+    logger.info(f"[{asset_name}] Step 5: Building CNN-LSTM sequences...")
     if generate_label and labels is not None:
-        logger.info(f"[{asset_name}] Step 5: Building CNN-LSTM sequences...")
-        feature_cols = get_indicator_feature_columns()
         X, y = build_sequences(df_normalised, labels, feature_cols=feature_cols)
     else:
-        feature_cols = get_indicator_feature_columns()
+        # Inference mode: build sequences without labels
+        X, _ = build_sequences(df_normalised, pd.Series(np.zeros(len(df_normalised), dtype=int), index=df_normalised.index), feature_cols=feature_cols)
 
     n_features = len([c for c in feature_cols if c in df_normalised.columns])
 

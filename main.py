@@ -9,6 +9,9 @@
 #   python main.py --mode dashboard                # Launch Streamlit dashboard
 #
 # Self-improvement check runs automatically after every backtest.
+import sys, os
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'synthtrade'))
+
 
 import os, sys, argparse, asyncio, logging
 import numpy as np
@@ -214,11 +217,23 @@ def main():
             if model is None:
                 logger.warning(f"No model for {asset}. Train first.")
                 continue
-            df_raw = asyncio.run(get_data(asset, n_candles=200))
+            df_raw = asyncio.run(get_data(asset, n_candles=500))
             if df_raw is None:
                 continue
-            pipe = run_pipeline(df_raw, asset_name=asset,
-                                generate_label=False, save_normaliser=False)
+            norm_path = os.path.join(MODELS_DIR, f"normaliser_{asset}.pkl")
+            from features.pipeline import FeatureNormaliser
+            normaliser = FeatureNormaliser()
+            if os.path.exists(norm_path):
+                normaliser.load(norm_path)
+                pipe = run_pipeline(df_raw, asset_name=asset,
+                                    normaliser=normaliser,
+                                    fit_normaliser=False,
+                                    generate_label=False,
+                                    save_normaliser=False)
+            else:
+                pipe = run_pipeline(df_raw, asset_name=asset,
+                                    generate_label=False,
+                                    save_normaliser=False)
             if pipe["X"] is None:
                 continue
             from models.cnn_lstm import predict_signal

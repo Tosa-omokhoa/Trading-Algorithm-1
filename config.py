@@ -63,13 +63,13 @@ ACTIVE_ASSETS = [
 # -----------------------------------------------------------------------------
 
 # Primary signal generation timeframe (CNN-LSTM runs here)
-PRIMARY_TF = "5m"
+PRIMARY_TF = "1h"
 
 # Trend bias filter timeframe (no trades against this structure)
-BIAS_TF = "15m"
+BIAS_TF = "4h"
 
 # Entry precision timeframe (used for fine-tuning entry price)
-ENTRY_TF = "1m"
+ENTRY_TF = "15m"
 
 # yfinance interval mapping
 YF_INTERVALS = {
@@ -86,7 +86,7 @@ YF_INTERVALS = {
 HISTORICAL_CANDLES = {
     "1m":  1500,
     "3m":  1500,
-    "5m":  2000,
+    "5m":  5000,
     "15m": 2000,
     "1h":  2000,
     "4h":  1000,
@@ -114,18 +114,22 @@ VOLUME_MA_PERIOD = 20              # For volume ratio calculation
 # -----------------------------------------------------------------------------
 
 # Minimum move to qualify as a valid signal (in ATR multiples)
-MIN_REWARD_ATR   = 1.5    # Price must move 1.5x ATR in signal direction
-MAX_RISK_ATR     = 1.0    # Without first hitting 1.0x ATR against signal
+MIN_REWARD_ATR   = 0.8    # Price must move 1.5x ATR in signal direction
+MAX_RISK_ATR     = 0.6    # Without first hitting 1.0x ATR against signal
 
 # How many forward candles to evaluate the label over
-LABEL_LOOKAHEAD  = 5
+LABEL_LOOKAHEAD  = 8
 
 # -----------------------------------------------------------------------------
 # MODEL AND SIGNAL THRESHOLDS
 # -----------------------------------------------------------------------------
 
 # Minimum model confidence to surface a signal on the dashboard
-SIGNAL_CONFIDENCE_THRESHOLD = 0.72
+SIGNAL_CONFIDENCE_THRESHOLD = 0.60
+
+# Early stopping controls - increase patience to prevent premature convergence
+EARLY_STOPPING_PATIENCE   = 15
+EARLY_STOPPING_MIN_DELTA  = 0.001
 
 # Risk-reward ratio used for SL/TP calculation on live signals
 SIGNAL_RR_RATIO  = 1.5    # TP = 1.5x the SL distance
@@ -148,7 +152,7 @@ RESULTS_DIR     = os.path.join(BASE_DIR, "backtest", "results")
 # -----------------------------------------------------------------------------
 
 DERIV_WS_URL    = "wss://ws.binaryws.com/websockets/v3"
-DERIV_WS_TIMEOUT = 30       # seconds before reconnect attempt
+DERIV_WS_TIMEOUT = 60       # seconds before reconnect attempt
 DERIV_TICK_BUFFER = 5000    # max ticks to hold in memory per asset
 
 # -----------------------------------------------------------------------------

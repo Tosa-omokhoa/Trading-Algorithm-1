@@ -40,12 +40,14 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 try:
     from config import (
         SEQUENCE_LENGTH, SIGNAL_CONFIDENCE_THRESHOLD,
-        MODELS_DIR
+        MODELS_DIR, EARLY_STOPPING_PATIENCE, EARLY_STOPPING_MIN_DELTA
     )
 except ImportError:
     SEQUENCE_LENGTH = 30
     SIGNAL_CONFIDENCE_THRESHOLD = 0.72
     MODELS_DIR = "models/saved"
+    EARLY_STOPPING_PATIENCE = 15
+    EARLY_STOPPING_MIN_DELTA = 0.001
 
 from features.dataset import (
     CLASS_NAMES, LABEL_TO_CLASS, CLASS_TO_LABEL,
@@ -61,6 +63,28 @@ logger = logging.getLogger("Model")
 # Suppress TensorFlow noise
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 
+# =============================================================================
+# FOCAL LOSS
+# =============================================================================
+
+def focal_loss(gamma: float = 2.0):
+    """
+    Focal loss for multi-class classification.
+    Penalises easy correct predictions, forcing the model to learn
+    harder minority classes (LONG and SHORT) instead of collapsing to NO_TRADE.
+    gamma=2.0 is the standard value from the original paper.
+    """
+    @tf.keras.utils.register_keras_serializable(package="SynthTrade")
+    def loss_fn(y_true, y_pred):
+        y_pred = tf.clip_by_value(y_pred, 1e-8, 1.0 - 1e-8)
+        # One-hot encode the integer labels
+        y_true_oh = tf.one_hot(tf.cast(y_true, tf.int32), depth=3)
+        cross_entropy = -y_true_oh * tf.math.log(y_pred)
+        weight = tf.pow(1.0 - y_pred, gamma)
+        loss = weight * cross_entropy
+        return tf.reduce_mean(tf.reduce_sum(loss, axis=1))
+    return loss_fn
+
 
 # =============================================================================
 # MODEL ARCHITECTURE
@@ -74,7 +98,7 @@ def build_cnn_lstm(
     dense_units:    int   = 64,
     dropout_rate:   float = 0.3,
     l2_reg:         float = 1e-4,
-    learning_rate:  float = 1e-3,
+    learning_rate:  float = 3e-4,
 ) -> keras.Model:
     """
     Build the CNN-LSTM hybrid model.
@@ -160,7 +184,7 @@ def build_cnn_lstm(
 
     model.compile(
         optimizer=Adam(learning_rate=learning_rate, clipnorm=1.0),
-        loss="sparse_categorical_crossentropy",
+        loss=focal_loss(gamma=2.0),
         metrics=[
             "accuracy",
             keras.metrics.SparseTopKCategoricalAccuracy(k=2, name="top2_acc"),
@@ -191,8 +215,8 @@ def train_model(
     asset_name:      str   = "ASSET",
     epochs:          int   = 80,
     batch_size:      int   = 32,
-    patience:        int   = 15,
-    min_delta:       float = 1e-4,
+    patience:        int   = EARLY_STOPPING_PATIENCE,
+    min_delta:       float = EARLY_STOPPING_MIN_DELTA,
     save_best:       bool  = True,
 ) -> keras.callbacks.History:
     """
@@ -229,7 +253,8 @@ def train_model(
             monitor="val_loss",
             patience=patience,
             min_delta=min_delta,
-            restore_best_weights=True,
+            restore_best_weights=False,
+            start_from_epoch=20,
             verbose=1
         ),
         callbacks.ReduceLROnPlateau(
@@ -475,6 +500,7 @@ def load_model(asset_name: str) -> Optional[keras.Model]:
     if not os.path.exists(path):
         logger.warning(f"No saved model found for {asset_name} at {path}")
         return None
+    focal_loss()  # Register custom loss so Keras can deserialize it
     model = keras.models.load_model(path)
     logger.info(f"Model loaded from {path}")
     return model

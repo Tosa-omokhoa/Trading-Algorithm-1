@@ -357,7 +357,7 @@ def prepare_dataset(
     X: np.ndarray,
     y: np.ndarray,
     asset_name:    str   = "ASSET",
-    resample:      str   = "moderate",
+    resample:      str   = "aggressive",
     n_folds:       int   = 5,
     val_ratio:     float = 0.15,
     wf_mode:       str   = "expanding",
