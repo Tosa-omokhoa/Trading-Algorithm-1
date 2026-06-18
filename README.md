@@ -150,7 +150,7 @@ Signal Suppressed         Signal Emitted
 
 ### Step 1: Clone the repository
 ```bash
-git clone https://github.com/Tosa9/Trading-Algorithm-1.git
+git clone git clone https://github.com/Tosa-omokhoa/Trading-Algorithm-1.git
 cd Trading-Algorithm-1
 ```
 
@@ -324,21 +324,20 @@ EMA_PERIODS     = [9, 21, 50]        # EMA horizon stack
 
 ## Performance (Demo Backtest)
 
-The following metrics are from a demo backtest on generated price data. Real performance figures will be updated once live training runs on actual market data are completed.
+The following metrics are from a live backtest on live price data.
 
-| Metric | Value |
-|---|---|
-| Win Rate | 63.4% |
-| Sharpe Ratio | 2.14 (annualised) |
-| Sortino Ratio | 3.01 (annualised) |
-| Max Drawdown | 8.3% |
-| Profit Factor | 1.87 |
-| Expectancy | +0.241 R per trade |
-| Total PnL | +43.7% |
-| CAGR | 38.2% |
-| Calmar Ratio | 4.6 |
+| Metric        | Value              |
+| ------------- | ------------------ |
+| Win Rate      | 57.9%              |
+| Sharpe Ratio  | 17.18              |
+| Sortino Ratio | 66.39              |
+| Max Drawdown  | 18.36%             |
+| Profit Factor | 1.964              |
+| Expectancy    | +0.408 R per trade |
+| Total PnL     | +256.55%           |
+| Total Trades  | 318                |
 
-> These are demo figures used to validate system mechanics. Live backtesting on real Deriv and forex data is in progress and results will replace these figures in a future commit.
+> Live backtest on XAUUSD (Gold) 1h data, 2026. Remaining assets in training.
 
 ---
 
