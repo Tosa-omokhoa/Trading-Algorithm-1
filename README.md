@@ -391,7 +391,7 @@ This project is for educational and research purposes. Algorithmic trading invol
 Mechanical Engineering Graduate, University of Nigeria Nsukka.
 Cross-disciplinary profile spanning petroleum engineering research, data science and machine learning, and software development.
 
-- GitHub: [@Tosa9](https://github.com/Tosa-omokhoa)
+- GitHub: [@Tosa-omokhoa](https://github.com/Tosa-omokhoa)
 - LinkedIn: [Oshose Omokhoa](https://linkedin.com/in/oshose-omokhoa-3982aa364)
 - X/Twitter: [@Tosa_omokhoa](https://twitter.com/Tosa_omokhoa)
 
